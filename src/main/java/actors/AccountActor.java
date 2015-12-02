@@ -8,18 +8,19 @@ import messages.DepositMessage;
 import messages.ResultMessage;
 import messages.WithdrawMessage;
 
+
 public class AccountActor extends UntypedActor {
 
     private LoggingAdapter LOG = Logging.getLogger(getContext().system(), this);
 
-    private String name;
+    private String owner;
     private int balance;
     private ActorRef transactionProcessor;
 
-    public AccountActor(String name, int balance, ActorRef transactionProcessor) {
-        this.name = name;
-        this.balance = balance;
+    public AccountActor(String owner, ActorRef transactionProcessor, int balance) {
+        this.owner = owner;
         this.transactionProcessor = transactionProcessor;
+        this.balance = balance;
     }
 
     @Override
@@ -31,7 +32,7 @@ public class AccountActor extends UntypedActor {
         } else if(message instanceof DepositMessage){
             LOG.info("deposit");
             balance += ((DepositMessage) message).getAmount();
-            transactionProcessor.tell(new ResultMessage(name,balance), getSelf());
+            transactionProcessor.tell(new ResultMessage(owner, balance), getSelf());
         } else {
             unhandled(message);
         }
